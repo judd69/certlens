@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CertLens — X-ray your certificates before they take you down</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#FFFFFF;color:#0E151C;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{position:sticky;top:16px;z-index:10;display:flex;justify-content:space-between;align-items:center;
+    max-width:1080px;margin:16px auto 0;padding:12px 20px;border-radius:999px;
+    background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border:1px solid #e4e8eb}
+  header b{letter-spacing:.08em}
+  header a{color:#0E151C;text-decoration:none;font-weight:600;font-size:14px}
+  .pillbtn{display:inline-block;background:#0E151C;color:#fff !important;padding:10px 20px;border-radius:999px;font-weight:700}
+  .pillbtn.red{background:#F80048}
+  main{max-width:1080px;margin:0 auto;padding:24px 20px 80px}
+  h1{font-size:clamp(56px,10vw,124px);line-height:.9;letter-spacing:-.03em;text-transform:uppercase;margin:48px 0 8px}
+  h1 span{color:#F80048}
+  .lede{font-size:clamp(18px,2.4vw,26px);line-height:1.4;max-width:640px;color:#3d4852}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:40px 0}
+  .card{background:#F1F3F5;border-radius:36px;padding:28px}
+  .card h2{margin:0 0 10px;font-size:22px;text-transform:uppercase;letter-spacing:.02em}
+  .card p{margin:0;line-height:1.55;color:#3d4852}
+  .card b{color:#0E151C}
+  .dark{background:#0E151C;color:#fff;border-radius:36px;padding:32px;margin:40px 0}
+  .dark h2{margin:0 0 18px;font-size:26px;text-transform:uppercase}
+  .dark ol{margin:0;padding-left:22px;line-height:2;font-size:17px}
+  .dark code{background:#22303c;padding:3px 10px;border-radius:999px;font-size:14px}
+  .terminal{background:#0E151C;color:#e8eef2;border-radius:32px;padding:24px 28px;overflow-x:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.6;white-space:pre}
+  .terminal .exp{color:#ff5c7a;font-weight:700}
+  .terminal .warn{color:#ffd479;font-weight:700}
+  .demo{background:#F1F3F5;border-radius:36px;padding:32px;margin:40px 0;text-align:center}
+  .demo h2{margin:0 0 6px;text-transform:uppercase;font-size:24px}
+  .demo p{color:#3d4852;margin:0 0 24px}
+  #badge{display:inline-block;padding:16px 40px;border-radius:999px;font-size:28px;font-weight:800;letter-spacing:.04em;
+    background:#0E151C;color:#fff;transition:background-color .35s cubic-bezier(.34,1.3,.64,1),
+    color .35s cubic-bezier(.34,1.3,.64,1),transform .35s cubic-bezier(.34,1.3,.64,1)}
+  #badge.EXPIRING{background:#F9C5D5;color:#0E151C}
+  #badge.EXPIRED{background:#F80048;color:#fff}
+  #days{font-size:20px;font-weight:700;margin-top:20px}
+  input[type=range]{width:min(480px,90%);accent-color:#F80048;margin-top:16px}
+  .cmd{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#F1F3F5;border-radius:999px;
+    padding:12px 12px 12px 24px;margin:24px 0}
+  .cmd code{flex:1;min-width:260px;font-size:15px;overflow-x:auto;white-space:nowrap}
+  .cmd button{background:#F80048;color:#fff;border:0;padding:10px 22px;border-radius:999px;font-weight:700;cursor:pointer}
+  .flags{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 0;padding:0;list-style:none}
+  .flags li{background:#F1F3F5;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600}
+  .flags li.hot{background:#F80048;color:#fff}
+  footer{color:#5b6770;font-size:14px;line-height:1.6}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}.dark ol{font-size:15px}}
+</style>
+</head>
+<body>
+<header>
+  <b>CERTLENS</b>
+  <nav><a href="sample-report.html">Sample report</a>&nbsp;&nbsp;<a class="pillbtn" href="sample-report.html">See it work</a></nav>
+</header>
+<main>
+  <h1>Certs expire.<br>Services <span>shouldn't.</span></h1>
+  <p class="lede">CertLens X-rays X.509 certificates — files, keystores, live hosts — and tells you, in one verdict, whether anything is expired, weak, or about to expire.</p>
+  <p><a class="pillbtn red" href="sample-report.html">View the sample report</a>&nbsp;&nbsp;<span style="font-weight:600">Repo: judd69 / certlens</span></p>
+
+  <div class="grid">
+    <div class="card"><h2>Every input</h2><p>PEM files and multi-cert bundles, DER files, JKS / PKCS12 keystores, and live <b>host:port</b> checks over a real TLS handshake — with the served chain captured, not just the leaf.</p></div>
+    <div class="card"><h2>Real analysis</h2><p>Validity windows, days remaining, SANs, signature algorithm, key type and size, self-signed detection, and hostname matching that is wildcard-aware and case-insensitive.</p></div>
+    <div class="card"><h2>Weak flags</h2><p>MD5 / SHA1 signatures, RSA under 2048 bits, EC under 224, any DSA, expired, not-yet-valid, and hostname mismatch — each named, not hidden behind a score.</p></div>
+    <div class="card"><h2>One verdict</h2><p><b>EXPIRED</b> beats <b>WEAK</b> beats <b>EXPIRING</b> beats <b>HEALTHY</b>. Gate CI with <b>--fail-on</b> and get exit code 1 before a bad cert ships.</p></div>
+  </div>
+
+  <section class="demo" aria-label="Interactive verdict demo">
+    <h2>Try the verdict</h2>
+    <p>Drag the slider. The badge morphs the way CertLens judges a leaf certificate.</p>
+    <div><span id="badge">HEALTHY</span></div>
+    <div id="days">60 days remaining</div>
+    <input id="slider" type="range" min="-10" max="90" value="60" step="1">
+    <div style="display:flex;justify-content:space-between;max-width:480px;margin:6px auto 0;color:#5b6770;font-size:13px">
+      <span>-10 (expired)</span><span>30 (warn window)</span><span>90</span>
+    </div>
+  </section>
+
+  <div class="dark">
+    <h2>How it works</h2>
+    <ol>
+      <li>Point it at a cert: <code>certlens cert.pem</code></li>
+      <li>Or a live service: <code>certlens --host example.com</code></li>
+      <li>Read the verdict, or gate a pipeline: <code>certlens --fail-on expired *.pem</code></li>
+      <li>Ship the evidence: <code>certlens --format html --output report.html *.pem</code></li>
+    </ol>
+  </div>
+
+  <h2 style="text-transform:uppercase">Real output, real certificates</h2>
+  <p style="color:#3d4852">Generated 30 Oct 2026 by CertLens itself, from the example certificates shipped in this repo:</p>
+  <div class="terminal">CertLens report - 2 target(s), overall: <span class="exp">EXPIRED</span> (warn within 30 days)
+
+TARGET file: examples/soon-expiring.pem - <span class="warn">EXPIRING</span>
+  [1] CN=soon.certlens.example,O=CertLens Examples
+      Valid:   2026-10-30 02:30 UTC -&gt; 2026-11-09 02:30 UTC (9 days left)
+      Key:     RSA 2048 bits | Sig: SHA384withRSA | Self-signed: yes
+      Flags:   none
+
+TARGET file: examples/expired.pem - <span class="exp">EXPIRED</span>
+  [1] CN=expired.certlens.example,O=CertLens Examples
+      Valid:   2025-01-01 02:30 UTC -&gt; 2025-01-31 02:30 UTC (expired 638 days ago)
+      Key:     RSA 2048 bits | Sig: SHA384withRSA | Self-signed: yes
+      Flags:   expired</div>
+
+  <h2 style="text-transform:uppercase">What it flags</h2>
+  <ul class="flags">
+    <li class="hot">MD5 / SHA1 signatures</li>
+    <li class="hot">RSA &lt; 2048 bits</li>
+    <li class="hot">EC &lt; 224 bits</li>
+    <li class="hot">Any DSA key</li>
+    <li class="hot">Expired / not yet valid</li>
+    <li class="hot">Hostname mismatch</li>
+    <li>Self-signed (reported, not flagged)</li>
+  </ul>
+
+  <div class="cmd"><code id="cmdtext">java -jar build/certlens.jar --host example.com</code><button id="copybtn" type="button">Copy</button></div>
+
+  <footer>
+    <p>Zero-dependency Java 21 CLI. Build it with <b>./build.sh</b> (compiles, runs the 36-test JUnit suite, packages the jar). Reports are fully self-contained: the HTML report loads no external assets. The full sample report generated by the tool is on the <a href="sample-report.html" style="color:#0E151C">sample report page</a>.</p>
+  </footer>
+</main>
+<script>
+  var slider = document.getElementById('slider');
+  var badge = document.getElementById('badge');
+  var days = document.getElementById('days');
+  function update() {
+    var d = parseInt(slider.value, 10);
+    var label = d <= 0 ? 'EXPIRED' : (d <= 30 ? 'EXPIRING' : 'HEALTHY');
+    badge.textContent = label;
+    badge.className = label === 'HEALTHY' ? '' : label;
+    days.textContent = (d < 0 ? Math.abs(d) + ' days past expiry' : d + ' days remaining');
+  }
+  slider.addEventListener('input', update);
+  update();
+  document.getElementById('copybtn').addEventListener('click', function () {
+    var text = document.getElementById('cmdtext').textContent;
+    var btn = document.getElementById('copybtn');
+    function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta); done();
+    }
+  });
+</script>
+</body>
+</html>

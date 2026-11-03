@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CertLens report - EXPIRED</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#fff;color:#0E151C}header{padding:32px;max-width:1100px;margin:0 auto}h1{font-size:44px;letter-spacing:-1px;margin:0 0 8px;text-transform:uppercase}.meta{color:#5b6770}.cards{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}.card{border-radius:28px;padding:20px 24px;background:#F1F3F5;flex:1;min-width:200px}.card b{font-size:26px;display:block}.card.EXPIRED,.card.WEAK{background:#F80048;color:#fff}.card.EXPIRING{background:#F9C5D5}.controls{padding:0 32px 12px;max-width:1100px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap}.controls input,.controls select{padding:10px 14px;border-radius:999px;border:1px solid #d5dade;font-size:15px}table{width:100%;border-collapse:collapse;max-width:1100px;margin:0 auto 40px}th,td{text-align:left;padding:12px 16px;border-bottom:1px solid #e4e8eb;font-size:14px;vertical-align:top}th{cursor:pointer;white-space:nowrap}.pill{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:700;font-size:12px;background:#F1F3F5}.pill.EXPIRED,.pill.WEAK{background:#F80048;color:#fff}.pill.EXPIRING{background:#F9C5D5}.bar{height:10px;border-radius:999px;background:#F1F3F5;overflow:hidden;min-width:120px}.bar i{display:block;height:100%;background:#0E151C}.bar.EXPIRED i,.bar.WEAK i{background:#F80048}.bar.EXPIRING i{background:#F9C5D5}.err{color:#F80048;font-weight:700}@media(max-width:700px){h1{font-size:30px}table{font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+<h1>CertLens report</h1>
+<p class="meta">Reference time 2026-10-30T02:38:31.602115769Z | warn within 30 days</p>
+<div class="cards">
+<div class="card EXPIRED"><span>OVERALL VERDICT</span><b>EXPIRED</b></div>
+<div class="card"><span>TARGETS</span><b>2</b></div>
+<div class="card"><span>CERTIFICATES</span><b>2</b></div>
+</div>
+</header>
+<div class="controls"><input id="q" placeholder="Filter certificates…"><select id="vf"><option value="">All verdicts</option><option>HEALTHY</option><option>EXPIRING</option><option>WEAK</option><option>EXPIRED</option></select></div>
+<table id="t"><thead><tr><th data-k="0">Target</th><th data-k="1">Subject</th><th data-k="2">Valid to</th><th data-k="3">Days left</th><th data-k="4">Key / Sig</th><th data-k="5">Flags</th><th>Timeline</th></tr></thead>
+<tbody>
+<tr data-v="EXPIRING"><td>examples/soon-expiring.pem</td><td>CN=soon.certlens.example,O=CertLens Examples</td><td>2026-11-09 02:30 UTC</td><td>9</td><td>RSA 2048 bits | SHA384withRSA</td><td><span class="pill EXPIRING">EXPIRING</span> </td><td><div class="bar EXPIRING"><i style="width:2%"></i></div></td></tr>
+<tr data-v="EXPIRED"><td>examples/expired.pem</td><td>CN=expired.certlens.example,O=CertLens Examples</td><td>2025-01-31 02:30 UTC</td><td>-638</td><td>RSA 2048 bits | SHA384withRSA</td><td><span class="pill EXPIRED">EXPIRED</span> expired</td><td><div class="bar EXPIRED"><i style="width:100%"></i></div></td></tr>
+</tbody></table>
+<script>
+var q=document.getElementById('q'),vf=document.getElementById('vf'),rows=[].slice.call(document.querySelectorAll('#t tbody tr'));
+function apply(){var needle=q.value.toLowerCase();rows.forEach(function(r){var ok=(!vf.value||r.getAttribute('data-v')===vf.value)&&r.textContent.toLowerCase().indexOf(needle)>=0;r.style.display=ok?'':'none';});}
+q.addEventListener('input',apply);vf.addEventListener('change',apply);
+document.querySelectorAll('#t th[data-k]').forEach(function(th){th.addEventListener('click',function(){var k=+th.getAttribute('data-k'),tb=document.querySelector('#t tbody'),list=[].slice.call(tb.children);list.sort(function(a,b){return a.children[k].textContent.localeCompare(b.children[k].textContent);});list.forEach(function(r){tb.appendChild(r);});});});
+</script>
+</body>
+</html>
